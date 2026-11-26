@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using Application.Products.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ builder.Services.AddCors();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblyContaining<GetProductList.Handler>());
 
 var app = builder.Build();
 
