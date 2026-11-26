@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { List, ListItem, ListItemText, Typography } from '@mui/material'
 
 function App() {
   const [products, setProducts] = useState<Product[]>([])
@@ -10,16 +11,19 @@ function App() {
   }, [])
 
   return (
-    <div>
-      <h3>POSAdvanced</h3>
-      <ul>
+    <>
+      <Typography variant='h3'>POSAdvanced</Typography>
+      <List>
         {products.map(product => (
-          <li key={product.id}>
-            {product.name} ({product.category}), wariantów: {product.variants.length}
-          </li>
+          <ListItem key={product.id}>
+            <ListItemText
+              primary={product.name}
+              secondary={`${product.category} • wariantów: ${product.variants.length}`}
+            />
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </>
   )
 }
 
