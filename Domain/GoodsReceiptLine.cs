@@ -1,3 +1,4 @@
+namespace Domain;
 public class GoodsReceiptLine
 {
     public Guid Id { get; set; } = Guid.NewGuid();

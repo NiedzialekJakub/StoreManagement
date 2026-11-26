@@ -1,3 +1,4 @@
+namespace Domain;
 public class SaleLine
 {
     public Guid Id { get; set; } = Guid.NewGuid();
