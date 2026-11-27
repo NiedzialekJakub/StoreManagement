@@ -19,6 +19,8 @@ function App() {
       <Container maxWidth="xl" sx={{ mt: 3 }}>
         <ProductDashboard products={products} />
       </Container>
+      <h2>Kamil tu był</h2>
+      
     </Box>
   )
 }
