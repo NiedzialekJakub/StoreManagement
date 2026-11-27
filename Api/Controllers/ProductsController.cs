@@ -28,4 +28,24 @@ public class ProductsController : BaseApiController
     {
         return HandleResult(await Mediator.Send(new CreateProduct.Command { Product = product }, ct));
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult> EditProduct(Guid id, EditProductDto product, CancellationToken ct)
+    {
+        var result = await Mediator.Send(new EditProduct.Command { Id = id, Product = product }, ct);
+
+        if (!result.IsSuccess) return HandleResult(result);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> DeleteProduct(Guid id, CancellationToken ct)
+    {
+        var result = await Mediator.Send(new DeleteProduct.Command { Id = id }, ct);
+
+        if (!result.IsSuccess) return HandleResult(result);
+
+        return NoContent();
+    }
 }
