@@ -1,6 +1,7 @@
 import { Grid} from '@mui/material'
 import ProductList from './ProductList'
 import ProductDetail from '../details/ProductDetail'
+import ProductForm from '../form/ProductForm'
 
 type Props = {
   products: Product[]
@@ -24,6 +25,7 @@ export default function ProductDashboard({ products, selectedProduct, selectProd
             cancelSelectProduct={cancelSelectProduct}
              />
         )}
+        <ProductForm/>
         </Grid>
     </Grid>
   )
