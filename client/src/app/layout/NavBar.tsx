@@ -1,7 +1,11 @@
 import { AppBar, Box, Button, Container, Toolbar, Typography } from '@mui/material'
 import StorefrontIcon from '@mui/icons-material/Storefront'
 
-export default function NavBar() {
+type Props = {
+  openForm: () => void
+}
+
+export default function NavBar({ openForm }: Props) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -29,8 +33,8 @@ export default function NavBar() {
               </Button>
             </Box>
 
-            <Button size="large" variant="contained" color="warning">
-              Dodaj produkt
+              <Button onClick={openForm} size="large" variant="contained" color="warning">
+                Dodaj produkt
             </Button>
           </Toolbar>
         </Container>
