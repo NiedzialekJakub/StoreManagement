@@ -3,6 +3,7 @@ import {
   TableContainer, TableHead, TableRow, Typography
 } from '@mui/material'
 import { formatPrice } from '../../../lib/util/util'
+import { useProducts } from '../../../lib/hooks/useProducts'
 
 type Props = {
   product: Product
@@ -11,6 +12,14 @@ type Props = {
 }
 
 export default function ProductDetail({ product, cancelSelectProduct, openForm }: Props) {
+  const { deleteProduct } = useProducts()
+
+  const handleDelete = () => {
+  if (window.confirm(`Usunąć produkt „${product.name}”? Zniknie z listy, a historia sprzedaży zostanie zachowana.`)) {
+    deleteProduct.mutate(product.id)
+  }
+}
+
   return (
     <Card sx={{ borderRadius: 3 }}>
       <CardContent>
@@ -56,6 +65,7 @@ export default function ProductDetail({ product, cancelSelectProduct, openForm }
       <CardActions>
         <Button onClick={() => openForm(product.id)} color="primary">Edytuj</Button>
         <Button onClick={cancelSelectProduct} color="inherit">Zamknij</Button>
+        <Button onClick={handleDelete} disabled={deleteProduct.isPending} color="error">Usuń</Button>
       </CardActions>
     </Card>
   )

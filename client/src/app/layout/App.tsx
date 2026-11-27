@@ -1,50 +1,33 @@
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-import { Box, Container, CssBaseline } from '@mui/material'
+import { useState } from 'react'
+import { Alert, Box, CircularProgress, Container, CssBaseline } from '@mui/material'
 import NavBar from './NavBar'
 import ProductDashboard from '../../features/products/dashboard/ProductDashboard'
-
-const api = 'https://localhost:5001/api'
-
-const fetchProducts = () =>
-  axios.get<Product[]>(`${api}/products`).then(response => response.data)
+import { useProducts } from '../../lib/hooks/useProducts'
 
 function App() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined)
+  const { products, isPending, isError } = useProducts()
+  const [selectedId, setSelectedId] = useState<string | undefined>(undefined)
   const [editMode, setEditMode] = useState(false)
 
-  useEffect(() => {
-    fetchProducts().then(setProducts)
-  }, [])
+  // produkt zawsze z aktualnej listy, więc po edycji dane są świeże
+  const selectedProduct = products?.find(p => p.id === selectedId)
 
   const handleSelectProduct = (id: string) => {
-    setSelectedProduct(products.find(x => x.id === id))
+    setSelectedId(id)
     setEditMode(false)
   }
 
-  const handleCancelSelectProduct = () => setSelectedProduct(undefined)
+  const handleCancelSelectProduct = () => setSelectedId(undefined)
 
   const handleOpenForm = (id?: string) => {
-    setSelectedProduct(id ? products.find(x => x.id === id) : undefined)
+    setSelectedId(id)
     setEditMode(true)
   }
 
   const handleFormClose = () => setEditMode(false)
 
-  const handleCreateProduct = async (data: CreateProductData) => {
-    const response = await axios.post<string>(`${api}/products`, data)
-    const list = await fetchProducts()
-    setProducts(list)
-    setSelectedProduct(list.find(p => p.id === response.data))
-    setEditMode(false)
-  }
-
-  const handleEditProduct = async (id: string, data: EditProductData) => {
-    await axios.put(`${api}/products/${id}`, data)
-    const list = await fetchProducts()
-    setProducts(list)
-    setSelectedProduct(list.find(p => p.id === id))
+  const handleSaved = (id: string) => {
+    setSelectedId(id)
     setEditMode(false)
   }
 
@@ -53,17 +36,26 @@ function App() {
       <CssBaseline />
       <NavBar openForm={handleOpenForm} />
       <Container maxWidth="xl" sx={{ mt: 3 }}>
-        <ProductDashboard
-          products={products}
-          selectProduct={handleSelectProduct}
-          cancelSelectProduct={handleCancelSelectProduct}
-          selectedProduct={selectedProduct}
-          editMode={editMode}
-          openForm={handleOpenForm}
-          closeForm={handleFormClose}
-          createProduct={handleCreateProduct}
-          editProduct={handleEditProduct}
-        />
+        {isPending && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+            <CircularProgress />
+          </Box>
+        )}
+        {isError && (
+          <Alert severity="error">Nie udało się pobrać produktów. Czy API jest uruchomione?</Alert>
+        )}
+        {products && (
+          <ProductDashboard
+            products={products}
+            selectProduct={handleSelectProduct}
+            cancelSelectProduct={handleCancelSelectProduct}
+            selectedProduct={selectedProduct}
+            editMode={editMode}
+            openForm={handleOpenForm}
+            closeForm={handleFormClose}
+            onSaved={handleSaved}
+          />
+        )}
       </Container>
     </Box>
   )

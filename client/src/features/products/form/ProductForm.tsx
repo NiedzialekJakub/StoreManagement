@@ -5,12 +5,12 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { useProducts } from '../../../lib/hooks/useProducts'
 
 type Props = {
   product?: Product
   closeForm: () => void
-  createProduct: (data: CreateProductData) => Promise<void>
-  editProduct: (id: string, data: EditProductData) => Promise<void>
+  onSaved: (id: string) => void
 }
 
 type VariantRow = {
@@ -53,8 +53,10 @@ function getErrorMessage(error: unknown): string {
   return 'Nie udało się zapisać produktu.'
 }
 
-export default function ProductForm({ product, closeForm, createProduct, editProduct }: Props) {
+export default function ProductForm({ product, closeForm, onSaved }: Props) {
   const isEdit = product !== undefined
+  const { createProduct, updateProduct } = useProducts()
+  const saving = createProduct.isPending || updateProduct.isPending
 
   const [name, setName] = useState(product?.name ?? '')
   const [description, setDescription] = useState(product?.description ?? '')
@@ -64,7 +66,6 @@ export default function ProductForm({ product, closeForm, createProduct, editPro
     product ? product.variants.map((v, i) => rowFromVariant(v, i)) : [emptyRow(0)]
   )
   const [error, setError] = useState<string | null>(null)
-  const [saving, setSaving] = useState(false)
   const nextKey = useRef(1)
 
   const updateRow = (key: number, field: keyof Omit<VariantRow, 'key' | 'id'>, value: string) => {
@@ -74,45 +75,47 @@ export default function ProductForm({ product, closeForm, createProduct, editPro
   const removeRow = (key: number) => setRows(rows.filter(r => r.key !== key))
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setSaving(true)
-    try {
-      if (product) {
-        await editProduct(product.id, {
-          name,
-          description: description || undefined,
-          category,
-          isActive,
-          variants: rows.map(r => ({
-            id: r.id!,
-            price: toNumber(r.price),
-            minQuantity: Number(r.minQuantity),
-            shelfLocation: r.shelfLocation || undefined
-          }))
-        })
-      } else {
-        await createProduct({
-          name,
-          description: description || undefined,
-          category,
-          variants: rows.map(r => ({
-            ean: r.ean,
-            sku: r.sku,
-            size: r.size,
-            color: r.color,
-            price: toNumber(r.price),
-            minQuantity: Number(r.minQuantity),
-            shelfLocation: r.shelfLocation || undefined
-          }))
-        })
+      e.preventDefault()
+      setError(null)
+      try {
+        if (product) {
+          await updateProduct.mutateAsync({
+            id: product.id,
+            data: {
+              name,
+              description: description || undefined,
+              category,
+              isActive,
+              variants: rows.map(r => ({
+                id: r.id!,
+                price: toNumber(r.price),
+                minQuantity: Number(r.minQuantity),
+                shelfLocation: r.shelfLocation || undefined
+              }))
+            }
+          })
+          onSaved(product.id)
+        } else {
+          const newId = await createProduct.mutateAsync({
+            name,
+            description: description || undefined,
+            category,
+            variants: rows.map(r => ({
+              ean: r.ean,
+              sku: r.sku,
+              size: r.size,
+              color: r.color,
+              price: toNumber(r.price),
+              minQuantity: Number(r.minQuantity),
+              shelfLocation: r.shelfLocation || undefined
+            }))
+          })
+          onSaved(newId)
+        }
+      } catch (err) {
+        setError(getErrorMessage(err))
       }
-    } catch (err) {
-      setError(getErrorMessage(err))
-    } finally {
-      setSaving(false)
     }
-  }
 
   return (
     <Paper sx={{ borderRadius: 3, padding: 3 }}>
