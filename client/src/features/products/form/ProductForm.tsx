@@ -6,11 +6,10 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useProducts } from '../../../lib/hooks/useProducts'
+import { useNavigate } from 'react-router'
 
 type Props = {
   product?: Product
-  closeForm: () => void
-  onSaved: (id: string) => void
 }
 
 type VariantRow = {
@@ -53,9 +52,10 @@ function getErrorMessage(error: unknown): string {
   return 'Nie udało się zapisać produktu.'
 }
 
-export default function ProductForm({ product, closeForm, onSaved }: Props) {
+export default function ProductForm({ product}: Props) {
   const isEdit = product !== undefined
-  const { createProduct, updateProduct } = useProducts()
+  const navigate = useNavigate()
+  const { createProduct, updateProduct } = useProducts(product?.id)
   const saving = createProduct.isPending || updateProduct.isPending
 
   const [name, setName] = useState(product?.name ?? '')
@@ -92,9 +92,10 @@ export default function ProductForm({ product, closeForm, onSaved }: Props) {
                 minQuantity: Number(r.minQuantity),
                 shelfLocation: r.shelfLocation || undefined
               }))
+              
             }
           })
-          onSaved(product.id)
+          navigate(`/products/${product.id}`)
         } else {
           const newId = await createProduct.mutateAsync({
             name,
@@ -110,7 +111,7 @@ export default function ProductForm({ product, closeForm, onSaved }: Props) {
               shelfLocation: r.shelfLocation || undefined
             }))
           })
-          onSaved(newId)
+          navigate(`/products/${newId}`)
         }
       } catch (err) {
         setError(getErrorMessage(err))
@@ -175,7 +176,7 @@ export default function ProductForm({ product, closeForm, onSaved }: Props) {
         {error && <Alert severity="error">{error}</Alert>}
 
         <Box sx={{ display: 'flex', justifyContent: 'end', gap: 3 }}>
-          <Button color="inherit" onClick={closeForm}>Anuluj</Button>
+          <Button color="inherit" onClick={() => navigate(product ? `/products/${product.id}` : '/products')}>Anuluj</Button>
           <Button type="submit" color="success" variant="contained" disabled={saving}>
             Zapisz
           </Button>
