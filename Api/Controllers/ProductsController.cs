@@ -1,6 +1,7 @@
 using Application.Products;
 using Application.Products.Queries;
 using Microsoft.AspNetCore.Mvc;
+using Application.Products.Commands;
 
 namespace Api.Controllers;
 
@@ -20,5 +21,11 @@ public class ProductsController : BaseApiController
         if (product == null) return NotFound();
 
         return product;
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<Guid>> CreateProduct(CreateProductDto product, CancellationToken ct)
+    {
+        return HandleResult(await Mediator.Send(new CreateProduct.Command { Product = product }, ct));
     }
 }

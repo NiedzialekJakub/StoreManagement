@@ -12,4 +12,12 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     public required DbSet<GoodsReceiptLine> GoodsReceiptLines { get; set; }
     public required DbSet<Sale> Sales { get; set; }
     public required DbSet<SaleLine> SaleLines { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ProductVariant>().HasIndex(v => v.Ean).IsUnique();
+        modelBuilder.Entity<ProductVariant>().HasIndex(v => v.Sku).IsUnique();
+    }
 }
