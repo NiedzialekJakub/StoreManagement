@@ -1,45 +1,51 @@
-using System.Linq.Expressions;
 using Application.Products;
-using Domain;
+using Application.Products.Queries;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
+using Application.Products.Commands;
 
 namespace Api.Controllers;
 
-public class ProductsController(AppDbContext context) : BaseApiController
+public class ProductsController : BaseApiController
 {
-    // opis, jak zamienić Product z bazy na ProductDto; EF zamieni to na SQL
-    private static readonly Expression<Func<Product, ProductDto>> ToDto = p => new ProductDto(
-        p.Id,
-        p.Name,
-        p.Description,
-        p.Category,
-        p.IsActive,
-        p.Variants.Select(v => new ProductVariantDto(
-            v.Id, v.Ean, v.Sku, v.Size, v.Color,
-            v.Price, v.Quantity, v.MinQuantity, v.ShelfLocation)).ToList());
-
     [HttpGet]
-    public async Task<ActionResult<List<ProductDto>>> GetProducts()
+    public async Task<ActionResult<List<ProductDto>>> GetProducts(CancellationToken ct)
     {
-        return await context.Products
-            .Where(p => p.IsActive)
-            .OrderBy(p => p.Name)
-            .Select(ToDto)
-            .ToListAsync();
+        return await Mediator.Send(new GetProductList.Query(), ct);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ProductDto>> GetProductDetail(Guid id)
+    public async Task<ActionResult<ProductDto>> GetProductDetail(Guid id, CancellationToken ct)
     {
-        var product = await context.Products
-            .Where(p => p.Id == id)
-            .Select(ToDto)
-            .FirstOrDefaultAsync();
+        var product = await Mediator.Send(new GetProductDetails.Query { Id = id }, ct);
 
         if (product == null) return NotFound();
 
         return product;
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<Guid>> CreateProduct(CreateProductDto product, CancellationToken ct)
+    {
+        return HandleResult(await Mediator.Send(new CreateProduct.Command { Product = product }, ct));
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult> EditProduct(Guid id, EditProductDto product, CancellationToken ct)
+    {
+        var result = await Mediator.Send(new EditProduct.Command { Id = id, Product = product }, ct);
+
+        if (!result.IsSuccess) return HandleResult(result);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> DeleteProduct(Guid id, CancellationToken ct)
+    {
+        var result = await Mediator.Send(new DeleteProduct.Command { Id = id }, ct);
+
+        if (!result.IsSuccess) return HandleResult(result);
+
+        return NoContent();
     }
 }
