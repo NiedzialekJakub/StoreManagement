@@ -4,14 +4,18 @@ import { Box, Container, CssBaseline } from '@mui/material'
 import NavBar from './NavBar'
 import ProductDashboard from '../../features/products/dashboard/ProductDashboard'
 
+const api = 'https://localhost:5001/api'
+
+const fetchProducts = () =>
+  axios.get<Product[]>(`${api}/products`).then(response => response.data)
+
 function App() {
   const [products, setProducts] = useState<Product[]>([])
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined)
   const [editMode, setEditMode] = useState(false)
 
   useEffect(() => {
-    axios.get<Product[]>('https://localhost:5001/api/products')
-      .then(response => setProducts(response.data))
+    fetchProducts().then(setProducts)
   }, [])
 
   const handleSelectProduct = (id: string) => {
@@ -21,12 +25,28 @@ function App() {
 
   const handleCancelSelectProduct = () => setSelectedProduct(undefined)
 
-  const handleOpenForm = () => {
-    setSelectedProduct(undefined)
+  const handleOpenForm = (id?: string) => {
+    setSelectedProduct(id ? products.find(x => x.id === id) : undefined)
     setEditMode(true)
   }
 
-  const handleCloseForm = () => setEditMode(false)
+  const handleFormClose = () => setEditMode(false)
+
+  const handleCreateProduct = async (data: CreateProductData) => {
+    const response = await axios.post<string>(`${api}/products`, data)
+    const list = await fetchProducts()
+    setProducts(list)
+    setSelectedProduct(list.find(p => p.id === response.data))
+    setEditMode(false)
+  }
+
+  const handleEditProduct = async (id: string, data: EditProductData) => {
+    await axios.put(`${api}/products/${id}`, data)
+    const list = await fetchProducts()
+    setProducts(list)
+    setSelectedProduct(list.find(p => p.id === id))
+    setEditMode(false)
+  }
 
   return (
     <Box sx={{ bgcolor: '#eeeeee', minHeight: '100vh' }}>
@@ -39,7 +59,10 @@ function App() {
           cancelSelectProduct={handleCancelSelectProduct}
           selectedProduct={selectedProduct}
           editMode={editMode}
-          closeForm={handleCloseForm}
+          openForm={handleOpenForm}
+          closeForm={handleFormClose}
+          createProduct={handleCreateProduct}
+          editProduct={handleEditProduct}
         />
       </Container>
     </Box>

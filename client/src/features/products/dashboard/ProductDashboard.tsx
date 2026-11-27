@@ -9,11 +9,15 @@ type Props = {
   cancelSelectProduct: () => void
   selectedProduct?: Product
   editMode: boolean
+  openForm: (id: string) => void
   closeForm: () => void
+  createProduct: (data: CreateProductData) => Promise<void>
+  editProduct: (id: string, data: EditProductData) => Promise<void>
 }
 
 export default function ProductDashboard({
-  products, selectProduct, cancelSelectProduct, selectedProduct, editMode, closeForm
+  products, selectProduct, cancelSelectProduct, selectedProduct,
+  editMode, openForm, closeForm, createProduct, editProduct
 }: Props) {
   return (
     <Grid container spacing={3}>
@@ -22,9 +26,21 @@ export default function ProductDashboard({
       </Grid>
       <Grid size={5}>
         {selectedProduct && !editMode && (
-          <ProductDetail product={selectedProduct} cancelSelectProduct={cancelSelectProduct} />
+          <ProductDetail
+            product={selectedProduct}
+            cancelSelectProduct={cancelSelectProduct}
+            openForm={openForm}
+          />
         )}
-        {editMode && <ProductForm closeForm={closeForm} />}
+        {editMode && (
+          <ProductForm
+            key={selectedProduct?.id ?? 'new'}
+            product={selectedProduct}
+            closeForm={closeForm}
+            createProduct={createProduct}
+            editProduct={editProduct}
+          />
+        )}
       </Grid>
     </Grid>
   )

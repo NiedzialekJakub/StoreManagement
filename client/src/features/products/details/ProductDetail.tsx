@@ -7,9 +7,10 @@ import { formatPrice } from '../../../lib/util/util'
 type Props = {
   product: Product
   cancelSelectProduct: () => void
+  openForm: (id: string) => void
 }
 
-export default function ProductDetail({ product, cancelSelectProduct }: Props) {
+export default function ProductDetail({ product, cancelSelectProduct, openForm }: Props) {
   return (
     <Card sx={{ borderRadius: 3 }}>
       <CardContent>
@@ -53,7 +54,7 @@ export default function ProductDetail({ product, cancelSelectProduct }: Props) {
         </TableContainer>
       </CardContent>
       <CardActions>
-        <Button color="primary">Edytuj</Button>
+        <Button onClick={() => openForm(product.id)} color="primary">Edytuj</Button>
         <Button onClick={cancelSelectProduct} color="inherit">Zamknij</Button>
       </CardActions>
     </Card>
