@@ -1,4 +1,6 @@
-import { Grid, List, ListItem, ListItemText } from '@mui/material'
+import { Grid} from '@mui/material'
+import ProductList from './ProductList'
+import ProductDetail from '../details/ProductDetail'
 
 type Props = {
   products: Product[]
@@ -8,17 +10,13 @@ export default function ProductDashboard({ products }: Props) {
   return (
     <Grid container>
       <Grid size={7}>
-        <List>
-          {products.map(product => (
-            <ListItem key={product.id}>
-              <ListItemText
-                primary={product.name}
-                secondary={`${product.category} • wariantów: ${product.variants.length}`}
-              />
-            </ListItem>
-          ))}
-        </List>
+        <ProductList products={products} />
       </Grid>
+        <Grid size={5}>
+          {products[0] && (
+            <ProductDetail product={products[0]} />
+          )}
+        </Grid>
     </Grid>
   )
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { Container, CssBaseline } from '@mui/material'
+import { Box, Container, CssBaseline } from '@mui/material'
 import NavBar from './NavBar'
 import ProductDashboard from '../../features/products/dashboard/ProductDashboard'
 
@@ -13,13 +13,13 @@ function App() {
   }, [])
 
   return (
-    <>
+    <Box sx={{bgcolor: '#eeeeee'}}>
       <CssBaseline />
       <NavBar />
       <Container maxWidth="xl" sx={{ mt: 3 }}>
         <ProductDashboard products={products} />
       </Container>
-    </>
+    </Box>
   )
 }
 
