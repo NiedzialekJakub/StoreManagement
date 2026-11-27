@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { List, ListItem, ListItemText, Typography } from '@mui/material'
+import { Container, CssBaseline, List, ListItem, ListItemText, Typography } from '@mui/material'
 import axios from 'axios'
+import NavBar from './NavBar'
 
 function App() {
   const [products, setProducts] = useState<Product[]>([])
@@ -10,9 +11,11 @@ useEffect(() => {
     .then(response => setProducts(response.data))
 }, [])
 
-  return (
-    <>
-      <Typography variant='h3'>POSAdvanced</Typography>
+return (
+  <>
+    <CssBaseline />
+    <NavBar />
+    <Container maxWidth="xl" sx={{ mt: 3 }}>
       <List>
         {products.map(product => (
           <ListItem key={product.id}>
@@ -23,8 +26,9 @@ useEffect(() => {
           </ListItem>
         ))}
       </List>
-    </>
-  )
+    </Container>
+  </>
+)
 }
 
 export default App
