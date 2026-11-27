@@ -1,44 +1,33 @@
-import { Grid } from '@mui/material'
+import { Alert, Box, CircularProgress, Grid, Paper, Typography } from '@mui/material'
 import ProductList from './ProductList'
-import ProductDetail from '../details/ProductDetail'
-import ProductForm from '../form/ProductForm'
+import { useProducts } from '../../../lib/hooks/useProducts'
 
-type Props = {
-  products: Product[]
-  selectProduct: (id: string) => void
-  cancelSelectProduct: () => void
-  selectedProduct?: Product
-  editMode: boolean
-  openForm: (id: string) => void
-  closeForm: () => void
-  onSaved: (id: string) => void
-}
+export default function ProductDashboard() {
+  const { products, isPending, isError } = useProducts()
 
-export default function ProductDashboard({
-  products, selectProduct, cancelSelectProduct, selectedProduct,
-  editMode, openForm, closeForm, onSaved
-}: Props) {
+  if (isPending) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (isError || !products) {
+    return <Alert severity="error">Nie udało się pobrać produktów. Czy API jest uruchomione?</Alert>
+  }
+
   return (
     <Grid container spacing={3}>
       <Grid size={7}>
-        <ProductList products={products} selectProduct={selectProduct} />
+        <ProductList products={products} />
       </Grid>
       <Grid size={5}>
-        {selectedProduct && !editMode && (
-          <ProductDetail
-            product={selectedProduct}
-            cancelSelectProduct={cancelSelectProduct}
-            openForm={openForm}
-          />
-        )}
-        {editMode && (
-          <ProductForm
-            key={selectedProduct?.id ?? 'new'}
-            product={selectedProduct}
-            closeForm={closeForm}
-            onSaved={onSaved}
-          />
-        )}
+        <Paper sx={{ borderRadius: 3, p: 3 }}>
+          <Typography variant="h6">TODO: Filtry i wyszukiwanie</Typography>
+          <Typography color="text.secondary">Zadezydujcie jak to filtrować i wyszukiwać, ja bym wyszukiwał po nazwie to na pewno i nie wiem jescze po czym</Typography>
+          <Typography color="text.secondary">w filtrach powiny byc opcje filtrowania czy są braki, bo jako sklep trzeba dostarczyć te braki, wymyślcie własne filtry</Typography>
+        </Paper>
       </Grid>
     </Grid>
   )

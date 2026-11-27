@@ -1,29 +1,39 @@
 import {
-  Button, Card, CardActions, CardContent, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Typography
+  Alert, Box, Button, Card, CardActions, CardContent, Chip, CircularProgress,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography
 } from '@mui/material'
-import { formatPrice } from '../../../lib/util/util'
+import { Link, useNavigate, useParams } from 'react-router'
 import { useProducts } from '../../../lib/hooks/useProducts'
+import { formatPrice } from '../../../lib/util/util'
 
-type Props = {
-  product: Product
-  cancelSelectProduct: () => void
-  openForm: (id: string) => void
-}
+export default function ProductDetail() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const { product, isLoadingProduct, deleteProduct } = useProducts(id)
 
-export default function ProductDetail({ product, cancelSelectProduct, openForm }: Props) {
-  const { deleteProduct } = useProducts()
+  if (isLoadingProduct) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (!product) return <Alert severity="warning">Nie znaleziono produktu.</Alert>
 
   const handleDelete = () => {
-  if (window.confirm(`Usunąć produkt „${product.name}”? Zniknie z listy, a historia sprzedaży zostanie zachowana.`)) {
-    deleteProduct.mutate(product.id)
+    if (window.confirm(`Usunąć produkt „${product.name}”? Zniknie z listy, a historia sprzedaży zostanie zachowana.`)) {
+      deleteProduct.mutate(product.id, { onSuccess: () => navigate('/products') })
+    }
   }
-}
 
   return (
-    <Card sx={{ borderRadius: 3 }}>
+    <Card sx={{ borderRadius: 3, maxWidth: 1000, mx: 'auto' }}>
       <CardContent>
-        <Typography variant="h5">{product.name}</Typography>
+        <Typography variant="h5">
+          {product.name}{' '}
+          {!product.isActive && <Chip label="Nieaktywny" size="small" sx={{ ml: 1 }} />}
+        </Typography>
         <Typography variant="subtitle1" sx={{ fontWeight: 'light' }}>{product.category}</Typography>
         <Typography variant="body1" sx={{ mb: 2 }}>{product.description}</Typography>
 
@@ -62,10 +72,11 @@ export default function ProductDetail({ product, cancelSelectProduct, openForm }
           </Table>
         </TableContainer>
       </CardContent>
+
       <CardActions>
-        <Button onClick={() => openForm(product.id)} color="primary">Edytuj</Button>
-        <Button onClick={cancelSelectProduct} color="inherit">Zamknij</Button>
+        <Button component={Link} to={`/products/${product.id}/edit`} color="primary">Edytuj</Button>
         <Button onClick={handleDelete} disabled={deleteProduct.isPending} color="error">Usuń</Button>
+        <Button onClick={() => navigate('/products')} color="inherit">Wróć do listy</Button>
       </CardActions>
     </Card>
   )

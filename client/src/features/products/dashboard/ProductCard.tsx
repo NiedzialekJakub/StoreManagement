@@ -1,11 +1,11 @@
 import { Box, Button, Card, CardActions, CardContent, Chip, Typography } from '@mui/material'
+import { Link } from 'react-router'
 
 type Props = {
   product: Product
-  selectProduct: (id: string) => void
 }
 
-export default function ProductCard({ product, selectProduct }: Props) {
+export default function ProductCard({ product }: Props) {
   const totalQuantity = product.variants.reduce((sum, v) => sum + v.quantity, 0)
   const lowStock = product.variants.some(v => v.quantity < v.minQuantity)
 
@@ -25,8 +25,8 @@ export default function ProductCard({ product, selectProduct }: Props) {
           <Chip label={product.category} variant="outlined" />
           {lowStock && <Chip label="Braki" color="warning" />}
         </Box>
-        <Button onClick={() => selectProduct(product.id)} size="medium" variant="contained">
-          Zobacz
+        <Button component={Link} to={`/products/${product.id}`} size="medium" variant="contained">
+            Zobacz
         </Button>
       </CardActions>
     </Card>

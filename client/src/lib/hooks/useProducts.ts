@@ -1,24 +1,36 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import agent from '../api/agent'
 
-export const useProducts = () => {
+export const useProducts = (id?: string) => {
   const queryClient = useQueryClient()
 
+  // lista, tylko gdy nie pytamy o konkretny produkt
   const { data: products, isPending, isError } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
       const response = await agent.get<Product[]>('/products')
       return response.data
-    }
+    },
+    enabled: !id
   })
 
-  // po każdej zmianie unieważniamy cache, a lista pobiera się od nowa
+  // jeden produkt, tylko gdy mamy id
+  const { data: product, isLoading: isLoadingProduct } = useQuery({
+    queryKey: ['products', id],
+    queryFn: async () => {
+      const response = await agent.get<Product>(`/products/${id}`)
+      return response.data
+    },
+    enabled: !!id,
+    retry: false   // 404 nie ma sensu ponawiać, od razu pokażemy "nie znaleziono"
+  })
+
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['products'] })
 
   const createProduct = useMutation({
     mutationFn: async (data: CreateProductData) => {
       const response = await agent.post<string>('/products', data)
-      return response.data   // Id nowego produktu
+      return response.data
     },
     onSuccess: refresh
   })
@@ -37,5 +49,9 @@ export const useProducts = () => {
     onSuccess: refresh
   })
 
-  return { products, isPending, isError, createProduct, updateProduct, deleteProduct }
+  return {
+    products, isPending, isError,
+    product, isLoadingProduct,
+    createProduct, updateProduct, deleteProduct
+  }
 }
