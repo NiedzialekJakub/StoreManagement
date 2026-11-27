@@ -5,36 +5,43 @@ import NavBar from './NavBar'
 import ProductDashboard from '../../features/products/dashboard/ProductDashboard'
 
 function App() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
+  const [products, setProducts] = useState<Product[]>([])
+  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined)
+  const [editMode, setEditMode] = useState(false)
 
   useEffect(() => {
     axios.get<Product[]>('https://localhost:5001/api/products')
       .then(response => setProducts(response.data))
   }, [])
 
-  const handleProductSelect = (id: string) => {
-    setSelectedProduct(products.find(product => product.id === id));
+  const handleSelectProduct = (id: string) => {
+    setSelectedProduct(products.find(x => x.id === id))
+    setEditMode(false)
   }
 
-  const handleCancelSelectProduct = () => {
-    setSelectedProduct(undefined);
+  const handleCancelSelectProduct = () => setSelectedProduct(undefined)
+
+  const handleOpenForm = () => {
+    setSelectedProduct(undefined)
+    setEditMode(true)
   }
+
+  const handleCloseForm = () => setEditMode(false)
 
   return (
-    <Box sx={{bgcolor: '#eeeeee'}}>
+    <Box sx={{ bgcolor: '#eeeeee', minHeight: '100vh' }}>
       <CssBaseline />
-      <NavBar />
+      <NavBar openForm={handleOpenForm} />
       <Container maxWidth="xl" sx={{ mt: 3 }}>
-        <ProductDashboard 
-        products={products}
-        selectedProduct={selectedProduct}
-        selectProduct={handleProductSelect}
-        cancelSelectProduct={handleCancelSelectProduct}
-         />
+        <ProductDashboard
+          products={products}
+          selectProduct={handleSelectProduct}
+          cancelSelectProduct={handleCancelSelectProduct}
+          selectedProduct={selectedProduct}
+          editMode={editMode}
+          closeForm={handleCloseForm}
+        />
       </Container>
-      <h2>Kamil tu był</h2>
-      
     </Box>
   )
 }
