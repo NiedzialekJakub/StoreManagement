@@ -4,18 +4,26 @@ import ProductDetail from '../details/ProductDetail'
 
 type Props = {
   products: Product[]
+  selectProduct: (id: string) => void;
+  cancelSelectProduct: () => void;
+  selectedProduct?: Product;
 }
 
-export default function ProductDashboard({ products }: Props) {
+export default function ProductDashboard({ products, selectedProduct, selectProduct, cancelSelectProduct }: Props) {
   return (
     <Grid container>
       <Grid size={7}>
-        <ProductList products={products} />
+        <ProductList 
+        products={products}
+        selectProduct={selectProduct}
+         />
       </Grid>
         <Grid size={5}>
-          {products[0] && (
-            <ProductDetail product={products[0]} />
-          )}
+        {selectedProduct && (
+            <ProductDetail product={selectedProduct}
+            cancelSelectProduct={cancelSelectProduct}
+             />
+        )}
         </Grid>
     </Grid>
   )

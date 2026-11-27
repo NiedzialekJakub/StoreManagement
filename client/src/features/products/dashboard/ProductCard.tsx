@@ -3,9 +3,10 @@ import Typography from '@mui/material/Typography'
 
 type Props ={
     product: Product
+    selectProduct: (id: string) => void;
 }
 
-export default function ProductCard({ product }: Props) {
+export default function ProductCard({ product, selectProduct }: Props) {
   return (
         <Card sx={{borderRadius: 3}}>
         <CardContent>
@@ -16,7 +17,9 @@ export default function ProductCard({ product }: Props) {
         </CardContent>
         <CardActions sx={{display: 'flex', justifyContent: 'space-between', pb: 2}}>
             <Chip label={product.category} variant="outlined" />
-            <Button size="medium" variant="contained">View</Button>
+            <Button onClick={() => selectProduct(product.id)} size="medium" variant="contained">
+                View
+            </Button>
         </CardActions>
     </Card>
   )

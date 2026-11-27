@@ -2,9 +2,10 @@ import { Card, CardMedia, CardContent, Typography, CardActions, Button } from "@
 
 type Props = {
   product: Product;
+  cancelSelectProduct: () => void;
 };
 
-export default function ProductDetail({ product }: Props) {
+export default function ProductDetail({ product, cancelSelectProduct }: Props) {
   return (
     <Card sx={{ borderRadius: 3 }}>
       <CardMedia
@@ -20,7 +21,9 @@ export default function ProductDetail({ product }: Props) {
       </CardContent>
       <CardActions>
         <Button color="primary">Edit</Button>
-        <Button color="inherit">Cancel</Button>
+        <Button color="inherit" onClick={cancelSelectProduct}>
+          Cancel
+        </Button>
       </CardActions>
     </Card>
   );
