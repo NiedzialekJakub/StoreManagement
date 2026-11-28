@@ -20,8 +20,8 @@ export default function NavBar() {
             </MenuList>
 
             <MenuList sx={{ display: 'flex', gap: 2, padding: 0 }}>
-              <MenuItemLink to="/products">Produkty</MenuItemLink>
-              <MenuItemLink to="/warehouse">Magazyn</MenuItemLink>
+              <MenuItemLink to="/products">Magazyn</MenuItemLink>
+              <MenuItemLink to="/receipts">Przyjęcia</MenuItemLink>
               <MenuItemLink to="/sales">Sprzedaż</MenuItemLink>
             </MenuList>
 

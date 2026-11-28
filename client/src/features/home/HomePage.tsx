@@ -9,7 +9,7 @@ export default function HomePage() {
         System kasowy i magazynowy
       </Typography>
       <Button component={Link} to="/products" variant="contained" size="large">
-        Przejdź do produktów
+        Przejdź do magazynu
       </Button>
     </Box>
   )
