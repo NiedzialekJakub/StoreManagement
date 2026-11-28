@@ -1,5 +1,4 @@
 import { useRef, useState, type FormEvent } from 'react'
-import axios from 'axios'
 import {
   Alert, Box, Button, FormControlLabel, IconButton, Paper, Switch, TextField, Typography
 } from '@mui/material'
@@ -7,6 +6,8 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useProducts } from '../../../lib/hooks/useProducts'
 import { useNavigate } from 'react-router'
+import { getErrorMessage } from '../../../lib/util/error'
+
 
 type Props = {
   product?: Product
@@ -41,16 +42,6 @@ const rowFromVariant = (v: ProductVariant, key: number): VariantRow => ({
 })
 
 const toNumber = (value: string) => Number(value.replace(',', '.'))
-
-function getErrorMessage(error: unknown): string {
-  if (axios.isAxiosError(error)) {
-    if (!error.response) return 'Brak połączenia z serwerem.'
-    const data = error.response.data
-    if (data?.detail) return data.detail
-    if (data?.errors) return Object.values(data.errors).flat().join(' ')
-  }
-  return 'Nie udało się zapisać produktu.'
-}
 
 export default function ProductForm({ product}: Props) {
   const isEdit = product !== undefined
@@ -114,7 +105,7 @@ export default function ProductForm({ product}: Props) {
           navigate(`/products/${newId}`)
         }
       } catch (err) {
-        setError(getErrorMessage(err))
+        setError(getErrorMessage(err, 'Nie udało się zapisać produktu.'))
       }
     }
 
