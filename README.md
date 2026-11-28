@@ -6,9 +6,6 @@
 |---|---|---|
 | Magazyn (kartoteka produktów) | gotowe | Produkty z wariantami (rozmiar, kolor, EAN, cena, minimum), podgląd stanu, dezaktywacja. |
 | Przyjęcia towaru (PZ) | gotowe | Dokument przyjęcia zwiększa stan magazynowy. Skan EAN lub wyszukiwarka. |
-| Filtr braków w Magazynie | w realizacji | Lista wariantów poniżej minimum (alert braków). |
-| Sprzedaż i zwroty | planowane | Kasa z koszykiem, historia paragonów, zwroty. Encje `Sale` i `SaleLine` są już w bazie. |
-| Logowanie i role | planowane | Kasjer, Magazynier, Kierownik. Na razie brak autoryzacji. |
 
 Poza zakresem prototypu: tryb offline, drukarka fiskalna, integracje (kurierzy, płatności, JPK), księgowość, grafik pracy.
 
